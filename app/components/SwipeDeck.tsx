@@ -14,6 +14,7 @@ type Props = {
 
 export function SwipeDeck({ onShowResults, onProgress }: Props) {
   const [pets, setPets] = useState<PetWithUserVote[] | null>(null);
+  const [allCount, setAllCount] = useState<number | null>(null);
   const [index, setIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [posting, setPosting] = useState(false);
@@ -28,6 +29,7 @@ export function SwipeDeck({ onShowResults, onProgress }: Props) {
       .then((r) => r.json())
       .then((data: { pets: PetWithUserVote[] }) => {
         if (cancelled) return;
+        setAllCount(data.pets.length);
         const unvoted = data.pets.filter((p) => p.user_choice == null);
         const shuffled = shuffle(unvoted);
         setPets(shuffled);
@@ -105,6 +107,14 @@ export function SwipeDeck({ onShowResults, onProgress }: Props) {
     return <FallbackMessage title="Loading good boys & girls…" body="" />;
   }
   if (pets.length === 0) {
+    if (allCount === 0) {
+      return (
+        <FallbackMessage
+          title="No pets in the database yet"
+          body="Run `npm run seed` to load the 103-pet starter set, then refresh."
+        />
+      );
+    }
     return (
       <FallbackMessage
         title="You've voted on every pet!"

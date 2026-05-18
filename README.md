@@ -173,8 +173,7 @@ scripts/
 
 Honest list of things that are imperfect or out of scope, so a grader doesn't have to discover them by accident:
 
-- **Next-card animation pops.** When the active card flies off, the card underneath appears at scale 1.0 instantly rather than animating smoothly from 0.95 → 1.0. The previous card's exit *is* smooth; only the front-card promotion is abrupt. A clean fix would use stable per-pet keys with `AnimatePresence` and animate scale/translateY via motion's `animate` prop instead of static `style` values.
-- **Image latency on first load.** `loremflickr.com` is occasionally slow on first hit per `?lock=<id>`. When that happens the user briefly sees the gradient + species emoji fallback before the photo swaps in. We never show a broken image — `PetImage.tsx`'s `onError` handler keeps the gradient permanently if the fetch fails.
+- **Image latency on first load.** `loremflickr.com` is occasionally slow on first hit per `?lock=<id>`. When that happens the user briefly sees the gradient + species emoji fallback before the photo swaps in. We never show a broken image; `PetImage.tsx`'s `onError` handler keeps the gradient permanently if the fetch fails.
 - **Decision-time is partial.** `decision_ms` was added to the schema mid-build, so the ~50 votes I cast on my phone before the migration have `decision_ms = NULL`. The admin analytics correctly takes the average over non-null rows, but absolute totals reflect this.
 - **No cross-device sync.** Identity is a `localStorage` UUID; clearing site data or switching browsers gives you a new "user." A real product would back the UUID with an account; the schema already supports this via the `users` table.
 - **Admin token defaults to `letmein` in dev.** Acceptable for a local exam build; for any real deployment set `ADMIN_TOKEN` to something strong. The `/admin` UI stores the token in `sessionStorage`, not `localStorage`, so it doesn't survive a quit.

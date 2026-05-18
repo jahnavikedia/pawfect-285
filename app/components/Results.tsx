@@ -93,9 +93,9 @@ export function Results() {
     <div className="flex-1 w-full flex flex-col">
       <div className="px-4 pt-2 pb-3 border-b border-stone-200 bg-[#faf5ff] sticky top-[52px] z-10">
         <div className="flex items-center justify-between mb-2">
-          <p className="text-xs text-stone-500 uppercase tracking-widest font-semibold flex items-center gap-1.5">
+          <p className="text-xs text-stone-500 uppercase tracking-widest font-semibold flex items-center gap-2">
             <LivePulse trigger={pulse} />
-            Community results
+            <span>Community results</span>
           </p>
           <p className="text-xs text-stone-500">{headline}</p>
         </div>
@@ -175,20 +175,24 @@ function LivePulse({ trigger }: { trigger: number }) {
   useEffect(() => {
     if (trigger === 0) return;
     setBright(true);
-    const id = setTimeout(() => setBright(false), 900);
+    const id = setTimeout(() => setBright(false), 1100);
     return () => clearTimeout(id);
   }, [trigger]);
   return (
     <span
       aria-label="live"
-      className={`inline-block w-2 h-2 rounded-full transition-colors ${
-        bright ? "bg-green-500" : "bg-green-400/50"
-      }`}
-      style={{
-        boxShadow: bright ? "0 0 0 4px rgba(34,197,94,0.20)" : "none",
-        transition: "box-shadow 600ms ease, background-color 200ms ease",
-      }}
-    />
+      className="inline-flex items-center gap-1.5 text-green-700 font-bold"
+    >
+      <span className="relative inline-flex w-2.5 h-2.5">
+        <span
+          className={`absolute inset-0 rounded-full bg-green-500 ${
+            bright ? "animate-ping" : "opacity-0"
+          }`}
+        />
+        <span className="relative inline-block w-2.5 h-2.5 rounded-full bg-green-500 ring-2 ring-green-200" />
+      </span>
+      <span className="text-[10px] tracking-widest">LIVE</span>
+    </span>
   );
 }
 

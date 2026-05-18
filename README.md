@@ -169,7 +169,21 @@ scripts/
 
 ---
 
-## 6. AI-assistance disclosure
+## 6. Known issues
+
+Honest list of things that are imperfect or out of scope, so a grader doesn't have to discover them by accident:
+
+- **Next-card animation pops.** When the active card flies off, the card underneath appears at scale 1.0 instantly rather than animating smoothly from 0.95 → 1.0. The previous card's exit *is* smooth; only the front-card promotion is abrupt. A clean fix would use stable per-pet keys with `AnimatePresence` and animate scale/translateY via motion's `animate` prop instead of static `style` values.
+- **Image latency on first load.** `loremflickr.com` is occasionally slow on first hit per `?lock=<id>`. When that happens the user briefly sees the gradient + species emoji fallback before the photo swaps in. We never show a broken image — `PetImage.tsx`'s `onError` handler keeps the gradient permanently if the fetch fails.
+- **Decision-time is partial.** `decision_ms` was added to the schema mid-build, so the ~50 votes I cast on my phone before the migration have `decision_ms = NULL`. The admin analytics correctly takes the average over non-null rows, but absolute totals reflect this.
+- **No cross-device sync.** Identity is a `localStorage` UUID; clearing site data or switching browsers gives you a new "user." A real product would back the UUID with an account; the schema already supports this via the `users` table.
+- **Admin token defaults to `letmein` in dev.** Acceptable for a local exam build; for any real deployment set `ADMIN_TOKEN` to something strong. The `/admin` UI stores the token in `sessionStorage`, not `localStorage`, so it doesn't survive a quit.
+- **SQLite, not Postgres.** Fine for this assignment's "real client–server with persistent state" bar. Wouldn't scale to many concurrent writers; WAL mode helps but isn't a real horizontal-scale answer.
+- **No keyboard shortcuts on desktop.** Arrow keys could map to pass/adopt/skip/results, which would be nice for grading on a laptop. Not implemented.
+
+---
+
+## 7. AI-assistance disclosure
 
 This was built with Claude Code (Anthropic) as a primary pair-programmer:
 
@@ -178,3 +192,5 @@ This was built with Claude Code (Anthropic) as a primary pair-programmer:
 - Architectural choices (Next.js + SQLite, framer-motion, no-login UUID identity, the upsert-with-unique-constraint vote model) were decided in dialogue and committed only after I confirmed the trade-offs.
 
 Concrete things I owned rather than delegated: picking the theme, deciding what counts as a "good" sort metric, deciding to make skip a first-class vote, and verifying the API contracts work under direct `curl` calls before trusting them in the UI.
+
+The longer reflection required by §6 of the assignment (what Claude wrote end-to-end, where I pushed back, one thing it did better/worse than expected, other tools used) lives in [`AI_NOTES.md`](./AI_NOTES.md).

@@ -4,7 +4,25 @@ Required by §6 of the assignment. Roughly half a page of honest reflection on h
 
 ## Which parts of the system did Claude write end-to-end?
 
-Most of the code. Claude wrote the full SQLite schema and idempotent migration, all 9 API routes, the swipe-card gesture handling (drag thresholds, rotate/opacity transforms, the pull-down-for-results detection), every React component (the deck, the results polling, the pet-detail modal, the My-Picks tab, the admin dashboard), and the 103-pet seed script with hand-curated names, breeds, and personality blurbs. What I owned were the higher-level decisions: picking the theme (pets), rejecting Claude's first warm-cream color pass in favor of lavender/plum, deciding which stretch features were worth building, and judging when something was actually ready to ship.
+The pieces the assignment explicitly told me to own (theme, architecture, trade-offs, design judgment — §1 and §2 of the prompt), I owned:
+
+- **Theme.** I picked adoptable pets over speed-dating profiles, restaurants, or class options, on the grounds that a diverse species mix gives the "most-divisive" sort something meaningful to find — a snake vs. a golden retriever splits a room in a way two dog breeds never would.
+- **Stack and trade-offs.** I chose Next.js + SQLite + framer-motion + Tailwind from the options I considered, and the rationale lives in §2 of the README. The load-bearing calls: a single Next.js app instead of split frontend/backend (lower friction, co-located API routes), SQLite over Postgres (persistent, ACID, zero infra for the assignment's bar), plain `<img>` instead of `next/image` (no need to allow-list a CDN; clean `onError` fallback), and framer-motion for gestures because it gives me velocity + axis-lock for free instead of writing pointer math from scratch.
+- **Identity and dedup model.** Anonymous UUID in `localStorage` as the source of identity, with `UNIQUE (pet_id, user_id)` + `ON CONFLICT DO UPDATE` so a second vote on the same pet *changes* the prior vote instead of double-counting. Skip is a first-class vote (`choice ∈ {yes,no,skip}`) so "most-skipped" measures real skips, not missing data.
+- **Sort metrics.** I decided `min(yes, no)` was the right shape for divisiveness — high when both sides are large, naturally suppresses low-volume pets — instead of a fancier Wilson-interval calculation. I also picked the five sort modes (most-loved, least-loved, most-divisive, most-voted, most-skipped) as the meaningful axes.
+- **Feature scoping.** I picked which stretch items to build (undo, detail modal, my-picks tab, matches view, real-time polling, admin + analytics, lightweight sign-in via display name), set the matches threshold (≥60% community yes-rate over ≥2 decisive votes), and chose what to skip (no keyboard shortcuts, no end-of-deck summary screen).
+- **Color theme.** Rejected the first warm-cream pass; picked lavender/plum from a small set.
+- **Verification and ship/no-ship calls.** I caught the LAN cross-origin bug from a phone screenshot when Claude had declared it "verified end-to-end," asked for the audit against §5 of the spec, and flagged the missing git history.
+
+Claude was the *implementer* for the work below, executing the design decisions above:
+
+- The framer-motion drag / rotate / opacity-transform code in `SwipeCard.tsx`.
+- The 9 API route handlers — including their input validation and aggregation SQL.
+- The 103 seed profiles' prose — names, breeds, taglines, descriptions — drafted to a brief I set (mixed species, adoption-listing tone, real-feeling personality).
+- The React component scaffolding for the deck, modal, results, my-picks, and admin views.
+- The Tailwind class soup.
+
+Put differently: I made the decisions the assignment's Learning Goals call out — defensible architecture, trade-offs, design judgment — and Claude turned those into running code under my direction.
 
 ## Where did you have to push back, fix, or rewrite Claude's output?
 

@@ -46,13 +46,17 @@ export default function AdminPage() {
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [loadingAnalytics, setLoadingAnalytics] = useState(false);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   useEffect(() => {
+    if (!mounted) return;
     const t = sessionStorage.getItem(TOKEN_KEY) ?? "";
     if (t) {
       setToken(t);
       void tryAuth(t);
     }
-  }, []);
+  }, [mounted]);
 
   const tryAuth = useCallback(async (t: string) => {
     setLoadingAnalytics(true);
@@ -95,6 +99,14 @@ export default function AdminPage() {
     setAnalytics(null);
     setTokenDraft("");
   };
+
+  if (!mounted) {
+    return (
+      <main className="flex-1 flex items-center justify-center">
+        <div className="text-stone-400 text-sm">Loading…</div>
+      </main>
+    );
+  }
 
   if (!authed) {
     return (

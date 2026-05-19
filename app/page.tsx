@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { SwipeDeck } from "./components/SwipeDeck";
 import { Results } from "./components/Results";
 import { MyPicks } from "./components/MyPicks";
@@ -14,10 +14,20 @@ export default function Home() {
     voted: 0,
     total: 0,
   });
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const onProgress = useCallback((voted: number, total: number) => {
     setProgress({ voted, total });
   }, []);
+
+  if (!mounted) {
+    return (
+      <main className="flex-1 flex items-center justify-center">
+        <div className="text-5xl opacity-80">🐾</div>
+      </main>
+    );
+  }
 
   return (
     <main className="flex-1 flex flex-col items-center w-full max-w-md mx-auto px-4">

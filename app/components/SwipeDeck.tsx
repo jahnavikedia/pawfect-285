@@ -20,7 +20,7 @@ export function SwipeDeck({ onShowResults, onProgress }: Props) {
   const [posting, setPosting] = useState(false);
   const [lastVote, setLastVote] = useState<{ petId: number; choice: Choice } | null>(null);
   const [detailPetId, setDetailPetId] = useState<number | null>(null);
-  const activeSinceRef = useRef<number>(Date.now());
+  const activeSinceRef = useRef<number>(0);
 
   useEffect(() => {
     const userId = getUserId();
